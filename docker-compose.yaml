@@ -3,7 +3,7 @@ services:
     image: node:18
     working_dir: /
     volumes:
-      - .:/
+      - .:/app
     ports:
       - "3000:4173"
     command: >
