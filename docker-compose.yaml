@@ -1,13 +1,12 @@
 services:
   svelte-app:
     image: node:18
-    working_dir: /
+    working_dir: /app
     volumes:
       - .:/app
     ports:
       - "3000:4173"
     command: >
-      sh -c "
-      npm install &&
+      sh -c "npm install &&
       npm run build &&
       npm run preview -- --host 0.0.0.0"
