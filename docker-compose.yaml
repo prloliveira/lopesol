@@ -1,0 +1,17 @@
+version: '3'
+services:
+  svelte-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:5173"
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+    environment:
+      - NODE_ENV=development
+    command: npm run dev -- --host 0.0.0.0
+
+volumes:
+  node_modules:
