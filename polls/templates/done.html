@@ -1,0 +1,24 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <title>Página de Sucesso</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    {% tailwind_css %}
+</head>
+<body class="bg-gray-50 leading-normal tracking-normal">
+    <div class="container mx-auto px-4">
+        <section class="flex items-center justify-center h-screen">
+            <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-md text-center">
+                <h1 class="text-2xl font-bold text-green-500 mb-4">Sucesso!</h1>
+                <p class="text-gray-700 text-lg">Os seus dados foram enviados com sucesso.</p>
+                <a href="/grafico/" class="mt-6 inline-block bg-blue-500 text-white py-2 px-4 rounded-lg">
+                    Ver Gráficos e Tabelas
+                </a>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

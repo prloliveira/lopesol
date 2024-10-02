@@ -1,0 +1,158 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Django Tailwind Form</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+    <!-- Google Fonts import -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+    {% tailwind_css %}
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Error styles */
+        .error-message {
+            color: red;
+            font-size: 0.875rem;
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 leading-normal tracking-normal">
+    <div class="container mx-auto px-4">
+        <section class="flex items-center justify-center h-screen">
+            <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
+                <h1 class="text-xl font-semibold mb-6">Recolha de Dados</h1>
+                <form id="dataForm" method="post">
+                    {% csrf_token %}
+                    
+                    <!-- Gender -->
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm mb-2" for="gender">Sexo</label>
+                        <select name="gender" id="gender" class="w-full p-2 border border-gray-300 rounded-lg" >
+                            <option value="" disabled selected>Selecione o sexo</option>
+                            {% for value, label in form.gender.field.choices %}
+                                <option value="{{ value }}" {% if value == form.gender.value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        <p class="error-message" id="gender-error">Por favor, selecione o sexo.</p>
+                    </div>
+
+                    <!-- Birth Date -->
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm mb-2" for="birth_date">Data de nascimento</label>
+                        <input type="date" name="birth_date" id="birth_date" value="{{ form.birth_date.value|default_if_none:'' }}" class="w-full p-2 border border-gray-300 rounded-lg" >
+                        <p class="error-message" id="birthdate-error">Por favor, insira a data de nascimento.</p>
+                    </div>
+
+                    <!-- Year Joined -->
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm mb-2" for="year_joined">Em que ano entrou para o Banco?</label>
+                        <input type="number" name="year_joined" id="year_joined" value="{{ form.year_joined.value|default_if_none:'' }}" class="w-full p-2 border border-gray-300 rounded-lg" min="1900" max="{{ current_year }}" >
+                        <p class="error-message" id="yearjoined-error">Por favor, insira o ano em que entrou para o banco.</p>
+                    </div>
+
+                    <!-- Unit Area -->
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm mb-2" for="unit_area">Qual a sua área/unidade?</label>
+                        <select name="unit_area" id="unit_area" class="w-full p-2 border border-gray-300 rounded-lg">
+                            <option value="" disabled selected>Selecione a área/unidade</option>
+                            {% for value, label in form.unit_area.field.choices %}
+                                <option value="{{ value }}" {% if value == form.unit_area.value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        <p class="error-message" id="unitarea-error">Por favor, selecione a sua área/unidade.</p>
+                    </div>
+
+                    <!-- Function -->
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm mb-2" for="function">função</label>
+                        <select name="function" id="function" class="w-full p-2 border border-gray-300 rounded-lg" >
+                            <option value="" disabled selected>Selecione a função</option>
+                            {% for value, label in form.function.field.choices %}
+                                <option value="{{ value }}" {% if value == form.function.value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        <p class="error-message" id="function-error">Por favor, selecione a sua função.</p>
+                    </div>
+
+                    <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-lg w-full">Enviar</button>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <!-- JavaScript for validation -->
+    <script>
+        const form = document.getElementById('dataForm');
+
+        form.addEventListener('submit', function(event) {
+            // Prevent form submission
+            event.preventDefault();
+
+            let isValid = true;
+
+            // Gender validation
+            const gender = document.getElementById('gender');
+            const genderError = document.getElementById('gender-error');
+            if (gender.value === '') {
+                genderError.style.display = 'block';
+                isValid = false;
+            } else {
+                genderError.style.display = 'none';
+            }
+
+            // Birth Date validation
+            const birthDate = document.getElementById('birth_date');
+            const birthDateError = document.getElementById('birthdate-error');
+            if (birthDate.value === '') {
+                birthDateError.style.display = 'block';
+                isValid = false;
+            } else {
+                birthDateError.style.display = 'none';
+            }
+
+            // Year Joined validation
+            const yearJoined = document.getElementById('year_joined');
+            const yearJoinedError = document.getElementById('yearjoined-error');
+            if (yearJoined.value === '') {
+                yearJoinedError.style.display = 'block';
+                isValid = false;
+            } else {
+                yearJoinedError.style.display = 'none';
+            }
+
+            // Unit Area validation
+            const unitArea = document.getElementById('unit_area');
+            const unitAreaError = document.getElementById('unitarea-error');
+            if (unitArea.value === '') {
+                unitAreaError.style.display = 'block';
+                isValid = false;
+            } else {
+                unitAreaError.style.display = 'none';
+            }
+
+            // Function validation
+            const functions = document.getElementById('function');
+            const functionError = document.getElementById('function-error');
+            if (functions.value === '') {
+                functionError.style.display = 'block';
+                isValid = false;
+            } else {
+                functionError.style.display = 'none';
+            }
+
+            // If all validations pass, submit the form
+            if (isValid) {
+                form.submit();
+            }
+        });
+    </script>
+</body>
+</html>

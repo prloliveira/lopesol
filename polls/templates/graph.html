@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graph Data</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        .tab {
+            display: none; /* Hide all tabs by default */
+        }
+
+        .tab-button {
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            border: none;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-button.active {
+            background-color: #ddd;
+            border-bottom: 2px solid #007BFF; /* Active tab color */
+        }
+
+        .tab-content {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Interactive Gráficos</h2>
+    <div>
+        <button class="tab-button active" onclick="showTab('decade')">Decades</button>
+        <button class="tab-button" onclick="showTab('department')">Department</button>
+        <button class="tab-button" onclick="showTab('gender')">Gender</button>
+        <button class="tab-button" onclick="showTab('function')">Function</button>
+    </div>
+
+    <div id="decade" class="tab tab-content"></div>
+    <div id="department" class="tab tab-content"></div>
+    <div id="gender" class="tab tab-content"></div>
+    <div id="function" class="tab tab-content"></div>
+
+    <script>
+        // Function to show the selected tab and hide others
+        function showTab(tabName) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.style.display = 'none';
+            });
+
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Show the selected tab and mark the button as active
+            document.getElementById(tabName).style.display = 'block';
+            document.querySelector(`.tab-button[onclick="showTab('${tabName}')"]`).classList.add('active');
+        }
+
+
+    // Define a color palette
+    const colorPalette = {
+        'AAS': '#1f77b4', // Blue
+        'AFI': '#ff7f0e', // Orange
+        'AII': '#2ca02c', // Green
+        'ASB': '#d62728', // Red
+        'DIR': '#9467bd', // Purple
+        'UATP': '#8c564b', // Brown
+        'UPC': '#e377c2', // Pink
+        'Masculino': '#1f77b4', // Blue for Male
+        'Feminino': '#ff7f0e', // Orange for Female
+        'Estagiário': '#2ca02c', // Green for Intern
+        'Técnico': '#d62728', // Red for Technician
+        'Coordenador': '#9467bd', // Purple for Coordinator
+        'Direção': '#8c564b', // Brown for Direction
+    };
+
+    // Function to render charts
+    function renderCharts() {
+        fetch("{% url 'bar_chart_data' %}")
+            .then(response => response.json())
+            .then(data => {
+                const decades = data.decades;
+
+                // Prepare traces for decades
+                const decadeTraces = Object.keys(data.data_per_area.decade).map(area => {
+                    return {
+                        x: decades,
+                        y: data.data_per_area.decade[area],
+                        name: area + ' (Decade)',  // Unique name for decade traces
+                        type: 'bar',
+                        marker: { color: colorPalette[area] }
+                    };
+                });
+
+                // Prepare traces for department
+                const departmentTraces = Object.keys(data.data_per_area.department).map(area => {
+                    return {
+                        x: [area],
+                        y: [data.data_per_area.department[area]],
+                        name: area + ' (Department)',  // Unique name for department traces
+                        type: 'bar',
+                        marker: { color: colorPalette[area] }
+                    };
+                });
+
+                // Prepare traces for gender
+                const genderTraces = [];
+                for (const area of Object.keys(data.data_per_area.gender.Masculino)) {
+                    const maleCount = data.data_per_area.gender['Masculino'][area]; // Get count
+                    const femaleCount = data.data_per_area.gender['Feminino'][area]; // Get count
+
+                    genderTraces.push({
+                        x: [area],
+                        y: [maleCount],
+                        name: 'Masculino in ' + area,  // Unique name for male traces
+                        type: 'bar',
+                        marker: { color: colorPalette['Masculino'] }
+                    });
+
+                    genderTraces.push({
+                        x: [area],
+                        y: [femaleCount],
+                        name: 'Feminino in ' + area,  // Unique name for female traces
+                        type: 'bar',
+                        marker: { color: colorPalette['Feminino'] }
+                    });
+                }
+
+                // Prepare traces for function
+                const functionTraces = [];
+                for (const func of ['Estagiário', 'Técnico', 'Coordenador', 'Direção']) {
+                    for (const area of Object.keys(data.data_per_area.function[func])) {
+                        const count = data.data_per_area.function[func][area]; // Get count
+                        functionTraces.push({
+                            x: [area],
+                            y: [count],
+                            name: func + ' in ' + area,  // Unique name for function traces
+                            type: 'bar',
+                            marker: { color: colorPalette[func] }
+                        });
+                    }
+                }
+
+                // Plotting charts
+                Plotly.newPlot('decade', decadeTraces, { title: 'Decades Data', barmode: 'group' });
+                Plotly.newPlot('department', departmentTraces, { title: 'Department Data', barmode: 'group' });
+                Plotly.newPlot('gender', genderTraces, { title: 'Gender Data', barmode: 'group' });
+                Plotly.newPlot('function', functionTraces, { title: 'Function Data', barmode: 'group' });
+
+                // Initially show the first tab
+                showTab('decade');
+            });
+    
+    }
+        // Call the function to render charts on page load
+        renderCharts();
+    </script>
+</body>
+</html>

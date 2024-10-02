@@ -1,23 +1,21 @@
-# Use the official Node.js image.
-FROM node:18
+# Dockerfile
+# Use the official Python image from the Docker Hub
+FROM python:3.11-slim
 
-# Set the working directory inside the container.
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json (or yarn.lock) first to leverage Docker cache.
-COPY package*.json ./
+# Copy the requirements file into the container
+COPY requirements.txt /app/
 
-# Install dependencies.
-RUN npm install
+# Install the dependencies from requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of your application code to the container.
-COPY . .
+# Copy the current directory contents into the container at /app
+COPY . /app/
 
-# Build the Svelte app.
-RUN npm run build
+# Expose port 8001 for the Django app
+EXPOSE 8001
 
-# Expose the port your app runs on.
-EXPOSE 4173
-
-# Command to run the app.
-CMD ["npm", "run", "preview", "--", "--host", "0.0.0.0"]
+# Run the Django development server
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8001"]

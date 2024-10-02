@@ -1,5 +1,0 @@
-services:
-  svelte-app:
-    build: .
-    ports:
-      - "3000:4173"
